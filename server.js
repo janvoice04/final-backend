@@ -9,7 +9,8 @@ const userModel=require("./models/usersmodel")
 const reportModel=require("./models/reportsmodel")
 const OtpModel=require("./models/otpmodel")
 const multer = require('multer')
-const nodemailer=require("nodemailer")
+const { Resend } = require("resend");
+const resend = new Resend(process.env.RESEND_API_KEY);
 const secret_key=process.env.JWT_SECRET
 app.use(express.static(__dirname+"/public"))
 app.use(
@@ -19,15 +20,6 @@ app.use(
 app.use(bodyParser.urlencoded({extended:true}))
 app.use(bodyParser.json())
 app.use(cors())
-const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 587,
-  secure: false,
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, 'uploads/')
@@ -130,12 +122,12 @@ app.post("/login", async (req, res) => {
 
      await otp.save();
  
-    await transporter.sendMail({
-      from: "bijinepallijoshitha@gmail.com",
-      to: user.email,
-      subject: "OTP Verification",
-      text: `Your OTP is ${Otp}`,
-    });
+    await resend.emails.send({
+  from: "onboarding@resend.dev",
+  to: user.email,
+  subject: "OTP Verification",
+  text: `Your OTP is ${Otp}`,
+});
      res.json({
       status:true,
       userId: user._id,
@@ -177,17 +169,12 @@ app.post("/resend-otp", async (req, res) => {
     await otpData.save();
 
     // Send Mail
-    await transporter.sendMail({
-
-      from: "bijinepallijoshitha@gmail.com",
-
-      to: user.email,
-
-      subject: "Resend OTP Verification",
-
-      text: `Your new OTP is ${newOtp}`,
-
-    });
+   await resend.emails.send({
+  from: "onboarding@resend.dev",
+  to: user.email,
+  subject: "OTP Verification",
+  text: `Your  new OTP is ${newOtp}`,
+});
 
     res.json({
       success: true,
@@ -338,19 +325,12 @@ app.post("/updateIssue", async (req, res) => {
       );
 
       // Send Mail
-      await transporter.sendMail({
-
-        from:
-          "bijinepallijoshitha@gmail.com",
-
-        to: user.email,
-
-        subject:
-          "Issue Status Updated",
-
-        text:
-          `Your issue "${report.issue_name}" has been updated to Assigned.`,
-      });
+      await resend.emails.send({
+  from: "onboarding@resend.dev",
+  to: user.email,
+  subject: "Issue Status Updated",
+  text: `Your issue "${report.issue_name}" has been updated to Assigned.`,
+});
 
       return res.json({
         msg: "Issue Assigned",
@@ -375,19 +355,12 @@ app.post("/updateIssue", async (req, res) => {
       );
 
       // Send Mail
-      await transporter.sendMail({
-
-        from:
-          "bijinepallijoshitha@gmail.com",
-
-        to: user.email,
-
-        subject:
-          "Issue Status Updated",
-
-        text:
-          `Your issue "${report.issue_name}" has been resolved.`,
-      });
+    await resend.emails.send({
+  from: "onboarding@resend.dev",
+  to: user.email,
+  subject: "Issue Status Updated",
+  text: `Your issue "${report.issue_name}" has been resolved.`,
+});
 
       return res.json({
         msg: "Issue Resolved",
