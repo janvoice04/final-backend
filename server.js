@@ -136,133 +136,25 @@ app.post("/login", async (req, res) => {
   console.log(user);
   if(user==null) {return res.json({ success: false, msg: "Invalid credentials" });}
   else{
-      const Otp = Math.floor(100000 + Math.random() * 900000).toString();
-      await OtpModel.deleteMany({ userId: user._id });
-      var otp=new OtpModel({
-        userId:user._id,
-        otp:Otp,
-        expiresAt: new Date(Date.now() + 5 * 60 * 1000),
-      })
-
-     await otp.save();
- 
- await sgMail.send({
-  to: user.email,
-  from: "JanVoice bijinepallijoshitha@gmail.com",
-  subject: "OTP Verification",
-  text: `Your OTP is ${Otp}`,
-});
-     res.json({
-      status:true,
-      userId: user._id,
-    });
-
-
-  }
-});
-app.post("/resend-otp", async (req, res) => {
-
-  try {
-
-    const { userId } = req.body;
-
-    // Find user
-    const user = await userModel.findById(userId);
-
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        msg: "User not found",
-      });
-    }
-
-    // Delete old OTP
-    await OtpModel.deleteMany({ userId });
-
-    // Generate new OTP
-    const newOtp =
-      Math.floor(100000 + Math.random() * 900000).toString();
-
-    // Save new OTP
-    const otpData = new OtpModel({
-      userId,
-      otp: newOtp,
-      expiresAt: new Date(Date.now() + 5 * 60 * 1000),
-    });
-
-    await otpData.save();
-
-    // Send Mail
-   await sgMail.send({
-   
-  to: user.email,
-   from:"JanVoice <bijinepallijoshitha@gmail.com>",
-  subject: "OTP Verification",
-  text: `Your  new OTP is ${newOtp}`,
-});
-
-    res.json({
-      success: true,
-      msg: "OTP resent successfully",
-    });
-
-  } catch (err) {
-
-    console.log(err);
-
-    res.status(500).json({
-      success: false,
-      msg: "Server Error",
-    });
-  }
-});
-app.post("/verify-otp", async (req, res) => {
-
-  const { userId, otp } = req.body;
-  console.log(userId, otp);
-  const user = await userModel.findById(userId);
-
-  const otpData = await OtpModel.findOne({ userId });
-
-  if (!otpData) {
-    return res.status(404).json({
-      message: "OTP not found",
-    });
-  }
-
-  // Expiry check
-  if (new Date() > otpData.expiresAt) {
-    return res.status(400).json({
-      message: "OTP expired",
-    });
-  }
-
-  // OTP check
-  if (otpData.otp !== otp) {
-    return res.status(400).json({
-      message: "Invalid OTP",
-    });
-  }
-
-  // Create JWT after OTP verification
-  const token = jwt.sign(
-    {userId, role: user.role },
+     const token = jwt.sign(
+    {userId: user._id, role: user.role },
     secret_key,
     { expiresIn: "1d" }
   );
-
-  // Delete OTP
-  await OtpModel.deleteOne({ _id: otpData._id });
-
-  res.status(200).json({
+    res.status(200).json({
     status: true,
     token,
-    userId,
+    userId: user._id,
     role: user.role,
     username: user.username,
 
   });
+
+
+  }
 });
+
+
 const verifyToken = (req, res, next) => {
     console.log("middleware");
   const auth = req.headers.authorization;
@@ -349,12 +241,6 @@ app.post("/updateIssue", async (req, res) => {
         }
       );
 
-     await sgMail.send({
-  to: user.email,
-  from: "JanVoice <bijinepallijoshitha@gmail.com>",
-  subject: "Issue Status Updated",
-  text: `Your issue "${report.issue_name}" has been updated to Assigned.`,
-});
 
       return res.json({
         msg: "Issue Assigned",
@@ -379,12 +265,7 @@ app.post("/updateIssue", async (req, res) => {
       );
 
       // Send Mail
-    await sgMail.send({
-  from: "JanVoice <bijinepallijoshitha@gmail.com>",
-  to: user.email,
-  subject: "Issue Status Updated",
-  text: `Your issue "${report.issue_name}" has been resolved.`,
-});
+    
 
       return res.json({
         msg: "Issue Resolved",
