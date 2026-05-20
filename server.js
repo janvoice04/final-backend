@@ -1,11 +1,12 @@
 const bodyParser = require("body-parser")
 const express=require("express")
+
+const app=express()
 app.use(cors({
   origin: "*",
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
-const app=express()
 require("dotenv").config()
 const jwt=require("jsonwebtoken")
 const connectDB=require("./db")
