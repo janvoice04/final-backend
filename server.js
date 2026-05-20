@@ -15,8 +15,9 @@ const userModel=require("./models/usersmodel")
 const reportModel=require("./models/reportsmodel")
 const OtpModel=require("./models/otpmodel")
 const multer = require('multer')
-const { Resend } = require("resend");
-const resend = new Resend(process.env.RESEND_API_KEY);
+const sgMail = require("@sendgrid/mail");
+
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 const secret_key=process.env.JWT_SECRET
 app.use(express.static(__dirname+"/public"))
 app.use(
@@ -145,9 +146,9 @@ app.post("/login", async (req, res) => {
 
      await otp.save();
  
-    await resend.emails.send({
-  from: "Acme <onboarding@resend.dev>",
+ await sgMail.send({
   to: user.email,
+  from: "bijinepallijoshitha@gmail.com",
   subject: "OTP Verification",
   text: `Your OTP is ${Otp}`,
 });
@@ -192,9 +193,10 @@ app.post("/resend-otp", async (req, res) => {
     await otpData.save();
 
     // Send Mail
-   await resend.emails.send({
-  from: "Acme <onboarding@resend.dev>",
+   await sgMail.send({
+   
   to: user.email,
+   from:"bijinepallijoshitha@gmail.com",
   subject: "OTP Verification",
   text: `Your  new OTP is ${newOtp}`,
 });
@@ -347,10 +349,9 @@ app.post("/updateIssue", async (req, res) => {
         }
       );
 
-      // Send Mail
-      await resend.emails.send({
-  from: "Acme <onboarding@resend.dev>",
+     await sgMail.send({
   to: user.email,
+  from: "bijinepallijoshitha@gmail.com",
   subject: "Issue Status Updated",
   text: `Your issue "${report.issue_name}" has been updated to Assigned.`,
 });
@@ -378,8 +379,8 @@ app.post("/updateIssue", async (req, res) => {
       );
 
       // Send Mail
-    await resend.emails.send({
-  from: "Acme <onboarding@resend.dev>",
+    await sgMail.send({
+  from: "bijinepallijoshitha@gmail.com",
   to: user.email,
   subject: "Issue Status Updated",
   text: `Your issue "${report.issue_name}" has been resolved.`,
