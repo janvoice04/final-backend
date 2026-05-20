@@ -1,0 +1,88 @@
+<html>
+<head>
+    <title>Login Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .login-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .login-container h2 {
+            margin-bottom: 20px;
+        }
+        .login-container input[type="text"],
+        .login-container input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .login-container button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .login-container button:hover {
+            background-color: #45a049;
+        }
+    </style>
+    <body>
+        <div class="login-container">
+            <h2>Login</h2>
+            <form onsubmit="handlesubmit(event)">
+                <input type="text" name="username" placeholder="Username" required>
+                <input type="password" name="password" placeholder="Password" required>
+                 <input type="text" name="role" placeholder="enter role" required>
+                <button>Login</button>
+            </form>
+            <button onclick="signup()">Signup</button>
+        </div>
+        <script>
+            function signup(){
+                window.location.href="signup.html"
+            }
+            function handlesubmit(ev){
+                ev.preventDefault();
+                
+             fetch("http://localhost:3600/login",{
+                method:"POST",
+                headers:{
+                    "Content-Type":"application/json"
+                },
+                body:JSON.stringify({
+                    username:ev.target[0].value,
+                    password:ev.target[1].value,
+                    role:ev.target[2].value
+                })
+            }).then(res=>res.json()).then(data=>{
+               
+                  if(data.msg==="login success"){
+                    window.localStorage.setItem("token",data.token)
+                    window.localStorage.setItem("username",data.username)
+                    window.localStorage.setItem("role",data.role)
+                   
+                   
+                    window.location.href="welcome.html"
+                }
+                else{
+                    window.location.href="loginform.html"
+            }})
+            
+        }
+        </script>
+    </body>
+</html>
