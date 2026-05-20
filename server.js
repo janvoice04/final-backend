@@ -128,7 +128,7 @@ app.post("/login", async (req, res) => {
      await otp.save();
  
     await resend.emails.send({
-  from: "onboarding@resend.dev",
+  from: "Acme <onboarding@resend.dev>",
   to: user.email,
   subject: "OTP Verification",
   text: `Your OTP is ${Otp}`,
@@ -175,7 +175,7 @@ app.post("/resend-otp", async (req, res) => {
 
     // Send Mail
    await resend.emails.send({
-  from: "onboarding@resend.dev",
+  from: "Acme <onboarding@resend.dev>",
   to: user.email,
   subject: "OTP Verification",
   text: `Your  new OTP is ${newOtp}`,
@@ -331,7 +331,7 @@ app.post("/updateIssue", async (req, res) => {
 
       // Send Mail
       await resend.emails.send({
-  from: "onboarding@resend.dev",
+  from: "Acme <onboarding@resend.dev>",
   to: user.email,
   subject: "Issue Status Updated",
   text: `Your issue "${report.issue_name}" has been updated to Assigned.`,
@@ -361,7 +361,7 @@ app.post("/updateIssue", async (req, res) => {
 
       // Send Mail
     await resend.emails.send({
-  from: "onboarding@resend.dev",
+  from: "Acme <onboarding@resend.dev>",
   to: user.email,
   subject: "Issue Status Updated",
   text: `Your issue "${report.issue_name}" has been resolved.`,
