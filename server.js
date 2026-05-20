@@ -40,19 +40,78 @@ const upload = multer({ storage })
 
 connectDB()
 
-app.post("/register", (req, res) => {
-    const new_user = new userModel({
-        username: req.body.username,
-        password: req.body.password,
-        email: req.body.email,
-        phoneno: req.body.phoneno,
-        role: req.body.role
-    })
+app.post("/register", async (req, res) => {
 
-    new_user.save().then(() => {
-        res.json({ success: true })
-    })
-})
+  try {
+
+    // CHECK EXISTING USERNAME
+    const existingUser =
+      await userModel.findOne({
+
+        username:
+          req.body.username
+
+      });
+
+    // IF USERNAME EXISTS
+    if (existingUser) {
+
+      return res.json({
+
+        success: false,
+
+        msg:
+          "Username already exists",
+
+      });
+    }
+
+    // CREATE NEW USER
+    const new_user =
+      new userModel({
+
+        username:
+          req.body.username,
+
+        password:
+          req.body.password,
+
+        email:
+          req.body.email,
+
+        phoneno:
+          req.body.phoneno,
+
+        role:
+          req.body.role
+
+      });
+
+    await new_user.save();
+
+    res.json({
+
+      success: true,
+
+      msg:
+        "Registration Successful",
+
+    });
+
+  } catch (err) {
+
+    console.log(err);
+
+    res.status(500).json({
+
+      success: false,
+
+      msg:
+        "Server Error",
+
+    });
+  }
+});
 app.post("/login", async (req, res) => {
   const { username, password ,role} = req.body;
     console.log(username,password)
