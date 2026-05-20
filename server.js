@@ -37,6 +37,24 @@ const upload = multer({ storage })
 
 
 connectDB()
+app.get("/email-test", async (req, res) => {
+  console.log("TEST HIT");
+
+  try {
+    const result = await resend.emails.send({
+      from: "onboarding@resend.dev",
+      to: "your-personal-email@gmail.com",
+      subject: "Test",
+      text: "Hello",
+    });
+
+    console.log(result);
+    res.json(result);
+  } catch (err) {
+    console.log("ERROR:", err);
+    res.status(500).json(err);
+  }
+});
 
 app.post("/register", async (req, res) => {
 
